@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechFest 2025 | Event Registration</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Paytm JS Checkout Script (for Staging/Test Environment) -->
+    <script type="application/javascript" crossorigin="anonymous" src="https://securegw-stage.paytm.in/merchantpgpui/checkoutjs/merchants/{{MID}}.js"></script>
+    
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        /* Style for the modal backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        /* Simple transition for modal */
+        .modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; /* bg-gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5; /* bg-indigo-600 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca; /* bg-indigo-700 */
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <!-- Header Section -->
+    <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-white tracking-tight">
+                TechFest <span class="text-indigo-500">2025</span>
+            </h1>
+            <p class="text-gray-400 mt-1">The ultimate celebration of technology and innovation.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        
+        <!-- Hero Section -->
+        <section class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4">Our Events</h2>
+            <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                Explore a diverse range of competitions and workshops. Choose an event below to register and showcase your skills.
+            </p>
+        </section>
+
+        <!-- Events Grid -->
+        <div id="events-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <!-- Event cards will be dynamically inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Registration Modal -->
+    <div id="registration-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div id="modal-content" class="modal bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transform scale-95 opacity-0">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-5 border-b border-gray-700">
+                <h3 class="text-2xl font-semibold text-white">Register for Event</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0_0_24_24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Registration Form -->
+            <form id="registration-form" class="p-6 space-y-6">
+                <input type="hidden" id="event-name-input" name="event">
+                <input type="hidden" id="event-price-input" name="price">
+                
+                <!-- Event Name Display -->
+                <div>
+                    <label class="text-sm font-medium text-gray-400">Event</label>
+                    <p id="modal-event-name" class="text-lg font-bold text-indigo-400 mt-1"></p>
+                </div>
+
+                <!-- Form Fields -->
+                <div>
+                    <label for="name" class="block mb-2 text-sm font-medium text-gray-300">Full Name</label>
+                    <input type="text" id="name" name="name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="John Doe" required>
+                </div>
+                <div>
+                    <label for="department" class="block mb-2 text-sm font-medium text-gray-300">Department</label>
+                    <input type="text" id="department" name="department" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="Computer Science" required>
+                </div>
+                <div>
+                    <label for="roll-number" class="block mb-2 text-sm font-medium text-gray-300">Roll Number</label>
+                    <input type="text" id="roll-number" name="roll-number" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="CS12345" required>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg">
+                    <span class="text-gray-400 font-medium">Amount to Pay:</span>
+                    <span id="modal-event-price" class="text-2xl font-bold text-white"></span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-500 font-medium rounded-lg text-sm px-5 py-3 text-center transition-colors">
+                    Proceed to Payment
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Success Message Toast -->
+    <div id="success-toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+        Registration Successful!
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA ---
+            const events = [
+                { name: "Code Sprint", description: "A fast-paced competitive programming challenge.", price: 75 },
+                { name: "Robo Wars", description: "Build and battle your own robot in an epic showdown.", price: 100 },
+                { name: "Web Weavers", description: "Design and develop a stunning website in 24 hours.", price: 80 },
+                { name: "AI Symposium", description: "A series of talks on the future of Artificial Intelligence.", price: 100 },
+                { name: "Capture The Flag", description: "A cybersecurity challenge to test your hacking skills.", price: 90 },
+                { name: "Game Jam", description: "Create a video game from scratch in just 48 hours.", price: 95 },
+                { name: "Drone Racing", description: "Navigate your drone through a complex obstacle course.", price: 100 },
+                { name: "Tech Startup Pitch", description: "Pitch your innovative startup idea to a panel of investors.", price: 50 }
+            ];
+
+            // --- DOM ELEMENTS ---
+            const eventsGrid = document.getElementById('events-grid');
+            const modal = document.getElementById('registration-modal');
+            const modalContent = document.getElementById('modal-content');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const registrationForm = document.getElementById('registration-form');
+            const successToast = document.getElementById('success-toast');
+
+            // --- FUNCTIONS ---
+            function populateEvents() {
+                events.forEach(event => {
+                    const card = document.createElement('div');
+                    card.className = "bg-gray-800/50 p-6 rounded-2xl shadow-lg flex flex-col hover:bg-gray-800/80 transition-all duration-300 transform hover:-translate-y-1";
+                    card.innerHTML = `
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold text-white">${event.name}</h3>
+                            <p class="text-gray-400 mt-2 mb-4">${event.description}</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-2xl font-extrabold text-indigo-400">₹${event.price}</span>
+                            <button class="register-btn bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                                data-event-name="${event.name}"
+                                data-event-price="${event.price}">
+                                Register
+                            </button>
+                        </div>
+                    `;
+                    eventsGrid.appendChild(card);
+                });
+            }
+
+            function openModal(name, price) {
+                document.getElementById('modal-event-name').textContent = name;
+                document.getElementById('modal-event-price').textContent = `₹${price}`;
+                document.getElementById('event-name-input').value = name;
+                document.getElementById('event-price-input').value = price;
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            function closeModal() {
+                modalContent.classList.add('scale-95', 'opacity-0');
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    registrationForm.reset();
+                }, 300);
+            }
+            
+            function showSuccessToast() {
+                successToast.classList.remove('translate-y-20', 'opacity-0');
+                successToast.classList.add('translate-y-0', 'opacity-100');
+                setTimeout(() => {
+                    successToast.classList.add('translate-y-20', 'opacity-0');
+                    successToast.classList.remove('translate-y-0', 'opacity-100');
+                }, 3000);
+            }
+
+            // --- PAYTM INTEGRATION LOGIC ---
+
+            /**
+             * This function simulates the payment process.
+             * In a real application, this would make a call to your backend server.
+             * @param {object} orderDetails - Contains amount, orderId, and user details.
+             */
+            function startPaytmTransaction(orderDetails) {
+                // ===================================================================
+                // IMPORTANT: BACKEND REQUIRED
+                // ===================================================================
+                // The code below is a DEMONSTRATION. A real integration needs a
+                // backend server to securely generate a 'txnToken' from Paytm.
+                //
+                // YOUR BACKEND SERVER'S JOB:
+                // 1. Receive order details from this frontend.
+                // 2. Use your Paytm Merchant ID and Merchant Key (NEVER expose these in frontend code).
+                // 3. Call Paytm's "Initiate Transaction API" to get a unique transaction token (txnToken).
+                // 4. Send this 'txnToken' back to this frontend page.
+                // ===================================================================
+
+                // Step 1: (SIMULATED) Fetch transaction token from your backend
+                // We will create a fake backend response here for demonstration.
+                console.log("Requesting transaction token from backend with details:", orderDetails);
+                
+                // This is a fake token. The Paytm popup will show an error,
+                // but this demonstrates the flow.
+                const fakeBackendResponse = {
+                    txnToken: "FAKE_TRANSACTION_TOKEN_12345",
+                    orderId: orderDetails.orderId,
+                    amount: orderDetails.amount
+                };
+
+                const txnToken = fakeBackendResponse.txnToken;
+
+                // Step 2: Configure Paytm CheckoutJS
+                const config = {
+                    "root": "",
+                    "flow": "DEFAULT",
+                    "data": {
+                        "orderId": orderDetails.orderId,
+                        "token": txnToken,
+                        "tokenType": "TXN_TOKEN",
+                        "amount": orderDetails.amount
+                    },
+                    "handler": {
+                        "notifyMerchant": function(eventName, data) {
+                            console.log("notifyMerchant handler function called");
+                            console.log("eventName => ", eventName);
+                            console.log("data => ", data);
+                        },
+                        "transactionStatus": function(paymentStatus){
+                            console.log("Payment status received: ", paymentStatus);
+                            // This function is called when the payment is complete.
+                            // In a real app, you would verify the status again on your backend
+                            // before saving to Firebase.
+                            if (paymentStatus.STATUS === "TXN_SUCCESS") {
+                                console.log("Payment successful! Saving to Firebase...");
+                                // ===================================================
+                                // TODO: SAVE TO FIREBASE HERE
+                                // ===================================================
+                                // After successful payment and backend verification,
+                                // save the final registration data to Firestore.
+                                //
+                                // Example (pseudo-code):
+                                // await addDoc(collection(db, "registrations"), orderDetails.userInfo);
+                                // ===================================================
+                                closeModal();
+                                showSuccessToast();
+                            } else {
+                                // Handle payment failure
+                                console.error("Payment failed:", paymentStatus.RESPMSG);
+                                alert("Payment failed: " + paymentStatus.RESPMSG);
+                                closeModal();
+                            }
+                        }
+                    }
+                };
+
+                // Step 3: Open the Paytm Payment Popup
+                if (window.Paytm && window.Paytm.CheckoutJS) {
+                    window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
+                        // After the init call, invoke checkoutjs to show the payment page.
+                        window.Paytm.CheckoutJS.invoke();
+                    }).catch(function onError(error) {
+                        console.log("Error => ", error);
+                    });
+                } else {
+                    alert("Paytm CheckoutJS is not loaded. Please check your script tag and MID.");
+                }
+            }
+
+
+            // --- EVENT LISTENERS ---
+            populateEvents();
+
+            eventsGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('register-btn')) {
+                    const name = e.target.dataset.eventName;
+                    const price = e.target.dataset.eventPrice;
+                    openModal(name, price);
+                }
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            registrationForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(registrationForm);
+                const registrationData = {
+                    name: formData.get('name'),
+                    department: formData.get('department'),
+                    rollNumber: formData.get('roll-number'),
+                    event: formData.get('event'),
+                    timestamp: new Date().toISOString()
+                };
+                
+                const eventPrice = formData.get('price');
+
+                // Create a unique Order ID for this transaction
+                const orderId = "EVENT_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+                const orderDetails = {
+                    amount: eventPrice,
+                    orderId: orderId,
+                    userInfo: registrationData
+                };
+
+                // Start the payment process
+                startPaytmTransaction(orderDetails);
+            });
+        });
+    </script>
+
+</body>
+</html>
