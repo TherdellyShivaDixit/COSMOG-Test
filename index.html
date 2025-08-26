@@ -11,34 +11,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <script type="module">
-  // Import the functions you need from the SDKs
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // ===================================================================
-  // ▼▼▼ PASTE YOUR REAL FIREBASE KEYS FROM THE CONSOLE HERE ▼▼▼
-  // ===================================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyAah84lK5EK5MrMU4ZyADkifGZvewXIWYA",
-  authDomain: "cosmogtest.firebaseapp.com",
-  projectId: "cosmogtest",
-  storageBucket: "cosmogtest.firebasestorage.app",
-  messagingSenderId: "893484280877",
-  appId: "1:893484280877:web:37cfb26cc2fa8ea3155ca4",
-  measurementId: "G-1BZTRNPX3X"
-};
-  // ===================================================================
+        // ===================================================================
+        // ▼▼▼ PASTE YOUR REAL FIREBASE KEYS FROM THE CONSOLE HERE ▼▼▼
+        // ===================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAah84lK5EK5MrMU4ZyADkifGZvewXIWYA",
+            authDomain: "cosmogtest.firebaseapp.com",
+            projectId: "cosmogtest",
+            storageBucket: "cosmogtest.firebasestorage.app",
+            messagingSenderId: "893484280877",
+            appId: "1:893484280877:web:37cfb26cc2fa8ea3155ca4",
+            measurementId: "G-1BZTRNPX3X"
+        };
+        // ===================================================================
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  // Initialize Cloud Firestore and get a reference to the service
-  const db = getFirestore(app);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        // Initialize Cloud Firestore and get a reference to the service
+        const db = getFirestore(app);
 
-  // Make db and Firestore functions available globally for the other script
-  window.db = db;
-  window.firebase = { collection, addDoc };
-</script>
+        // Make db and Firestore functions available globally for the other script
+        window.db = db;
+        window.firebase = { collection, addDoc };
+    </script>
     
     <style>
         /* Custom styles */
@@ -84,6 +86,7 @@ const firebaseConfig = {
             
             <form id="registration-form" class="p-6 space-y-6">
                 <input type="hidden" id="event-name-input" name="event">
+                <input type="hidden" id="event-price-input" name="price">
                 <div>
                     <label class="text-sm font-medium text-gray-400">Event</label>
                     <p id="modal-event-name" class="text-lg font-bold text-indigo-400 mt-1"></p>
@@ -100,12 +103,20 @@ const firebaseConfig = {
                     <label for="roll-number" class="block mb-2 text-sm font-medium text-gray-300">Roll Number</label>
                     <input type="text" id="roll-number" name="roll-number" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="CS12345" required>
                 </div>
+                <div>
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Email</label>
+                    <input type="email" id="email" name="email" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="johndoe@example.com" required>
+                </div>
+                <div>
+                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-300">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5" placeholder="9876543210" required>
+                </div>
                 <div class="flex items-center justify-between bg-gray-900/50 p-4 rounded-lg">
                     <span class="text-gray-400 font-medium">Event Price:</span>
                     <span id="modal-event-price" class="text-2xl font-bold text-white"></span>
                 </div>
-                <button type="submit" class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-500 font-medium rounded-lg text-sm px-5 py-3 text-center transition-colors">
-                    Confirm Registration
+                <button type="submit" id="pay-btn" class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-500 font-medium rounded-lg text-sm px-5 py-3 text-center transition-colors">
+                    Pay & Register
                 </button>
             </form>
         </div>
@@ -136,6 +147,18 @@ const firebaseConfig = {
             const registrationForm = document.getElementById('registration-form');
             const successToast = document.getElementById('success-toast');
 
+            // Set test prices (e.g., ₹1 for each event)
+            const testPrices = {
+                "Code Sprint": 1,
+                "Robo Wars": 1,
+                "Web Weavers": 1,
+                "AI Symposium": 1,
+                "Capture The Flag": 1,
+                "Game Jam": 1,
+                "Drone Racing": 1,
+                "Tech Startup Pitch": 1
+            };
+
             function populateEvents() {
                 events.forEach(event => {
                     const card = document.createElement('div');
@@ -160,8 +183,9 @@ const firebaseConfig = {
 
             function openModal(name, price) {
                 document.getElementById('modal-event-name').textContent = name;
-                document.getElementById('modal-event-price').textContent = `₹${price}`;
+                document.getElementById('modal-event-price').textContent = `₹${testPrices[name]}`;
                 document.getElementById('event-name-input').value = name;
+                document.getElementById('event-price-input').value = testPrices[name];
                 modal.classList.remove('hidden');
                 setTimeout(() => {
                     modalContent.classList.remove('scale-95', 'opacity-0');
@@ -201,29 +225,61 @@ const firebaseConfig = {
             registrationForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const { collection, addDoc } = window.firebase;
-                const db = window.db;
-
                 const formData = new FormData(registrationForm);
+                const eventName = formData.get('event');
+                const eventPrice = parseFloat(formData.get('price'));
+                
                 const registrationData = {
                     name: formData.get('name'),
                     department: formData.get('department'),
                     rollNumber: formData.get('roll-number'),
-                    event: formData.get('event'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    event: eventName,
+                    price: eventPrice,
                     registrationTime: new Date().toISOString()
                 };
-                
-                try {
-                    const docRef = await addDoc(collection(db, "registrations"), registrationData);
-                    console.log("Document written with ID: ", docRef.id);
-                    
-                    closeModal();
-                    showSuccessToast();
 
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    alert("There was an error saving your registration. Please check your Firebase configuration and security rules.");
-                }
+                // Razorpay Options
+                const options = {
+                    key: "rzp_live_R9r2qnsNEVDi7p", // Replace with your live or test key
+                    amount: eventPrice * 100, // Amount in paise
+                    currency: "INR",
+                    name: "TechFest 2025",
+                    description: `Registration for ${eventName}`,
+                    handler: async function (response) {
+                        // This function is called on successful payment
+                        const { collection, addDoc } = window.firebase;
+                        const db = window.db;
+
+                        // Add Razorpay payment details to the registration data
+                        registrationData.razorpay_payment_id = response.razorpay_payment_id;
+
+                        try {
+                            const docRef = await addDoc(collection(db, "registrations"), registrationData);
+                            console.log("Document written with ID: ", docRef.id);
+                            
+                            closeModal();
+                            showSuccessToast();
+
+                        } catch (error) {
+                            console.error("Error adding document: ", error);
+                            alert("Payment was successful, but there was an error saving your registration. Please contact support.");
+                        }
+                    },
+                    prefill: {
+                        name: registrationData.name,
+                        email: registrationData.email,
+                        contact: registrationData.phone
+                    },
+                    theme: {
+                        color: "#4f46e5"
+                    }
+                };
+                
+                const rzp1 = new Razorpay(options);
+                rzp1.open();
+                
             });
         });
     </script>
